@@ -6,16 +6,19 @@
   import DialogueBox from "$lib/components/DialogueBox.svelte";
   import FilterCanvas from "$lib/components/FilterCanvas.svelte";
 
-  let filterCanvas = $state<FilterCanvas>();
-  let img: HTMLImageElement | null = $state(null);
-  let options: FilterOptions = $state({
+  const defaultOptions: FilterOptions = {
     hue: 220,
     saturation: 0.5,
     lightness: 0,
     posterize: 5,
     noise: 40,
     contrast: 10
-  });
+  }
+
+  let filterCanvas = $state<FilterCanvas>();
+  let img: HTMLImageElement | null = $state(null);
+  let isCropping = $state(false);
+  let options: FilterOptions = $state(defaultOptions);
 
   function onKeydown(e: KeyboardEvent) {
     switch (e.key) {
@@ -64,6 +67,22 @@
     }
   }
 
+  function toggleCropping() {
+    isCropping = !isCropping;
+  }
+
+  function clear() {
+    img = null;
+  }
+
+  function resetFilters() {
+    options = defaultOptions;
+  }
+
+  function openFileDialog() {
+    // open file picker
+  }
+
   onMount(() => {
     const image = new Image();
     image.crossOrigin = "anonymous";
@@ -95,6 +114,13 @@
       [???]
     </div>
 
-    <DialogueBox onSave={filterCanvas.exportImage} />
+    <DialogueBox
+      onSave={filterCanvas?.exportImage}
+      onCrop={toggleCropping}
+      onClear={clear}
+      onReset={resetFilters}
+      onOpen={openFileDialog}
+      {isCropping}
+    />
   </div>
 </main>

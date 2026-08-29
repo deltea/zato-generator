@@ -1,8 +1,13 @@
 <script lang="ts">
   // const TYPING_SPEED = 1.0;
 
-  let { onSave }: {
+  let { onSave, onCrop, onClear, onReset, onOpen, isCropping }: {
     onSave: () => void;
+    onCrop: () => void;
+    onClear: () => void;
+    onReset: () => void;
+    onOpen: () => void;
+    isCropping: boolean;
   } = $props();
 </script>
 
@@ -22,11 +27,12 @@
   </div>
 
   <div class="flex bottom-0 left-1/2 -translate-x-1/2 absolute text-base text-muted">
-    <button class="px-3 pt-3 hover:text-fg">OPEN</button>
-    <button class="px-3 pt-3 hover:text-fg">CLEAR</button>
-    <button class="px-3 pt-3 hover:text-fg">CROP</button>
+    <button class="px-3 pt-3 hover:text-fg" onclick={onOpen}>Q.LOAD</button>
     <button class="px-3 pt-3 hover:text-fg" onclick={onSave}>Q.SAVE</button>
+    <button class="px-3 pt-3 hover:text-fg {isCropping ? "text-fg": "text-muted"}" onclick={onCrop}>CROP</button>
+    <button class="px-3 pt-3 hover:text-fg" onclick={onClear}>CLEAR</button>
+    <button class="px-3 pt-3 hover:text-fg" onclick={onReset}>RESET</button>
     <a href="https://github.com/deltea/zato-generator" class="px-3 pt-3 hover:text-fg">GITHUB</a>
-    <button class="px-3 pt-3 hover:text-fg">SHARE</button>
+    <!-- <button class="px-3 pt-3 hover:text-fg">SHARE</button> -->
   </div>
 </div>

@@ -4,4 +4,5 @@ export interface FilterOptions {
   lightness: number;
   posterize: number;
   noise: number;
+  contrast: number;
 }

@@ -68,7 +68,7 @@
 
       // turn to grayscale and apply contrast
       let gray = 0.299 * r + 0.587 * g + 0.114 * b;
-      gray = applySigmoidContrast(gray, 128, 10);
+      gray = applySigmoidContrast(gray, 128, options.contrast);
 
       r = g = b = gray;
 

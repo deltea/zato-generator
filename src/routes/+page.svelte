@@ -13,7 +13,8 @@
     saturation: 0.5,
     lightness: 0,
     posterize: 5,
-    noise: 40
+    noise: 40,
+    contrast: 10
   });
 
   function onKeydown(e: KeyboardEvent) {
@@ -41,6 +42,12 @@
         break;
       case "d":
         options.posterize = clamp(options.posterize - 1, 2, 8);
+        break;
+      case "q":
+        options.contrast = clamp(options.contrast - 1, 2, 16);
+        break;
+      case "e":
+        options.contrast = clamp(options.contrast + 1, 2, 16);
         break;
       case "1":
         options.noise = 0;

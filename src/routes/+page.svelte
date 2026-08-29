@@ -13,8 +13,8 @@
     </div>
 
     <!-- speaker card -->
-    <div class="text-3xl py-4 px-5 outline w-min -my-6 bg-bg ml-12 z-10 relative">
-      [MARINA]
+    <div class="text-3xl py-4 px-5 outline w-fit -my-6 bg-bg ml-12 z-10 relative">
+      [???]
     </div>
 
     <DialogueBox />

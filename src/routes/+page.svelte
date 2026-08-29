@@ -1,5 +1,19 @@
 <script lang="ts">
+  import { onMount } from "svelte";
+
   import DialogueBox from "$lib/components/DialogueBox.svelte";
+  import FilterCanvas from "$lib/components/FilterCanvas.svelte";
+
+  let filterCanvas = $state<FilterCanvas | undefined>();
+
+  onMount(() => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.src = "/images/original.webp";
+    img.onload = () => {
+      filterCanvas?.setImage(img);
+    };
+  });
 </script>
 
 <svelte:head>
@@ -8,15 +22,15 @@
 
 <main class="flex flex-col justify-end items-center h-screen px-32">
   <div class="max-w-7xl w-full">
-    <div class="outline w-full aspect-12/5 bg-[url('/filtered.png')] bg-cover bg-center pixelated border-4 border-bg">
-
+    <div class="border w-full pixelated">
+      <FilterCanvas bind:this={filterCanvas} />
     </div>
 
     <!-- speaker card -->
-    <div class="text-3xl py-4 px-5 outline w-fit -my-6 bg-bg ml-12 z-10 relative">
+    <div class="text-3xl py-4 px-5 border w-fit -my-6 bg-bg ml-12 z-10 relative">
       [???]
     </div>
 
-    <DialogueBox />
+    <DialogueBox onSave={filterCanvas?.exportImage} />
   </div>
 </main>

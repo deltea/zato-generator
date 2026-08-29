@@ -3,13 +3,21 @@
 
   import DialogueBox from "$lib/components/DialogueBox.svelte";
   import FilterCanvas from "$lib/components/FilterCanvas.svelte";
+    import type { FilterOptions } from "$lib/types";
 
   let filterCanvas = $state<FilterCanvas | undefined>();
+  let options: FilterOptions = {
+    hue: -144,
+    saturation: 0.5,
+    lightness: 0,
+    posterize: 5,
+    noise: 50
+  }
 
   onMount(() => {
     const img = new Image();
     img.crossOrigin = "anonymous";
-    img.src = "/images/original.webp";
+    img.src = "/images/placeholder/school.webp";
     img.onload = () => {
       filterCanvas?.setImage(img);
     };
@@ -23,7 +31,7 @@
 <main class="flex flex-col justify-end items-center h-screen px-32">
   <div class="max-w-7xl w-full">
     <div class="border w-full pixelated">
-      <FilterCanvas bind:this={filterCanvas} color="#D5D5FF" />
+      <FilterCanvas bind:this={filterCanvas} {options} />
     </div>
 
     <!-- speaker card -->

@@ -1,17 +1,11 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { clamp, noise, hslToRgb, rgbToHsl } from "$lib/utils";
+  import type { FilterOptions } from "$lib/types";
 
   const BORDER_WIDTH = 2;
-  let HUE = -138;
-  let SATURATION = 0.4;
-  let LIGHTNESS = 0.2;
-  let POSTERIZE = 6;
-  let NOISE = 40;
 
-  let { color }: {
-    color: string
-  } = $props();
+  let { options }: { options: FilterOptions } = $props();
 
   let canvas: HTMLCanvasElement;
   let ctx: CanvasRenderingContext2D;
@@ -20,14 +14,47 @@
   onMount(() => {
     ctx = canvas.getContext("2d")!;
 
-    document.addEventListener("keydown", (e: KeyboardEvent) => {
+    // document.addEventListener("keydown", (e: KeyboardEvent) => {
 
-    });
+    // });
   });
 
-  function applySigmoidContrast(value: number, midpoint = 200, steepness = 10) {
+  function applySigmoidContrast(value: number, midpoint = 128, steepness = 10) {
     const x = (value - midpoint) / 255;
     return 255 / (1 + Math.exp(-steepness * x));
+  }
+
+  function smoothstep(edge0: number, edge1: number, x: number) {
+    const t = Math.min(1, Math.max(0, (x - edge0) / (edge1 - edge0)));
+    return t * t * (3 - 2 * t);
+  }
+
+  function applyVignette(imageData: ImageData, options: { strength?: number, radius?: number, softness?: number } = {}) {
+    const {
+      strength = 0.8,
+      radius = 0.9,
+      softness = 0.8,
+    } = options;
+
+    const { data, width, height } = imageData;
+    const cx = width / 2;
+    const cy = height / 2;
+
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        const dx = (x - cx) / cx;
+        const dy = (y - cy) / cy;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        const falloff = smoothstep(radius, radius + softness, dist);
+        const factor = 1 - falloff * strength;
+
+        const i = (y * width + x) * 4;
+        data[i]     *= factor;
+        data[i + 1] *= factor;
+        data[i + 2] *= factor;
+      }
+    }
   }
 
   function filterImage(imgData: ImageDataArray) {
@@ -38,16 +65,16 @@
 
       // turn to grayscale and apply contrast
       let gray = 0.299 * r + 0.587 * g + 0.114 * b;
-      gray = applySigmoidContrast(gray, 160, 10);
+      gray = applySigmoidContrast(gray, 128, 10);
 
       r = g = b = gray;
 
       let { h, s, l } = rgbToHsl(r, g, b);
 
       // adjust hsl
-      h = (h + HUE + 360) % 360;
-      s = clamp(s + SATURATION, 0, 1);
-      l = clamp(l + LIGHTNESS, 0, 1);
+      h = (h + options.hue + 360) % 360;
+      s = clamp(s + options.saturation, 0, 1);
+      l = clamp(l + options.lightness, 0, 1);
 
       const rgb = hslToRgb(h, s, l);
       r = rgb.r;
@@ -55,12 +82,12 @@
       b = rgb.b;
 
       // add color noise
-      r = clamp(r + noise(NOISE), 0, 255);
-      g = clamp(g + noise(NOISE), 0, 255);
-      b = clamp(b + noise(NOISE), 0, 255);
+      r = clamp(r + noise(options.noise), 0, 255);
+      g = clamp(g + noise(options.noise), 0, 255);
+      b = clamp(b + noise(options.noise), 0, 255);
 
       // posterization
-      const step = 255 / (POSTERIZE - 1);
+      const step = 255 / (options.posterize - 1);
       r = Math.round(Math.round(r / step) * step);
       g = Math.round(Math.round(g / step) * step);
       b = Math.round(Math.round(b / step) * step);
@@ -93,6 +120,7 @@
     }
 
     const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    applyVignette(imgData);
     data = imgData.data;
     filterImage(data);
     ctx.putImageData(imgData, 0, 0);

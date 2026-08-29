@@ -53,7 +53,7 @@
         const factor = 1 - falloff * strength;
 
         const i = (y * width + x) * 4;
-        data[i]     *= factor;
+        data[i] *= factor;
         data[i + 1] *= factor;
         data[i + 2] *= factor;
       }

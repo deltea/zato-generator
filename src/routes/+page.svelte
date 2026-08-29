@@ -6,10 +6,10 @@
   import DialogueBox from "$lib/components/DialogueBox.svelte";
   import FilterCanvas from "$lib/components/FilterCanvas.svelte";
 
-  let filterCanvas = $state<FilterCanvas | undefined>();
+  let filterCanvas = $state<FilterCanvas>();
   let img: HTMLImageElement | null = $state(null);
   let options: FilterOptions = $state({
-    hue: -144,
+    hue: 220,
     saturation: 0.5,
     lightness: 0,
     posterize: 5,
@@ -95,6 +95,6 @@
       [???]
     </div>
 
-    <DialogueBox onSave={filterCanvas?.exportImage} />
+    <DialogueBox onSave={filterCanvas.exportImage} />
   </div>
 </main>

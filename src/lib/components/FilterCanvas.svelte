@@ -111,17 +111,19 @@
   export function setImage(img: HTMLImageElement | null, options: FilterOptions) {
     if (!img) return;
 
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
     // maintain aspect ration and center image
     if (img.width / img.height > canvas.width / canvas.height) {
       const scale = canvas.height / img.height;
       const newWidth = img.width * scale;
       const xOffset = (canvas.width - newWidth) / 2;
-      ctx.drawImage(img, xOffset, 0, newWidth, canvas.height);
+      ctx.drawImage(img, xOffset + options.position.x, options.position.y, newWidth, canvas.height);
     } else {
       const scale = canvas.width / img.width;
       const newHeight = img.height * scale;
       const yOffset = (canvas.height - newHeight) / 2;
-      ctx.drawImage(img, 0, yOffset, canvas.width, newHeight);
+      ctx.drawImage(img, options.position.x, yOffset + options.position.y, canvas.width, newHeight);
     }
 
     const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height, { });

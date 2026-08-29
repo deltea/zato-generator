@@ -9,6 +9,7 @@
   --color-bg: #000;
   --color-fg: #fff;
   --color-muted: #ababab;
+  --color-highlight: var(--color-yellow-400);
   --font-courier: "Courier New", monospace;
 }
 

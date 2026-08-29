@@ -12,58 +12,88 @@
     lightness: 0,
     posterize: 5,
     noise: 40,
-    contrast: 10
+    contrast: 10,
+    position: { x: 0, y: 0 }
   }
 
   let filterCanvas = $state<FilterCanvas>();
   let img: HTMLImageElement | null = $state(null);
   let isCropping = $state(false);
+  let isHoldingShift = false;
   let options: FilterOptions = $state(defaultOptions);
 
   function onKeydown(e: KeyboardEvent) {
-    switch (e.key) {
-      case "ArrowUp":
-        options.hue = wrap(options.hue + 10, 360);
-        break;
-      case "ArrowDown":
-        options.hue = wrap(options.hue - 10, 360);
-        break;
-      case "ArrowRight":
-        options.saturation = clamp(options.saturation + 0.1, 0, 1);
-        break;
-      case "ArrowLeft":
-        options.saturation = clamp(options.saturation - 0.1, 0, 1);
-        break;
-      case "w":
-        options.lightness = clamp(options.lightness + 0.1, -0.8, 0.8);
-        break;
-      case "s":
-        options.lightness = clamp(options.lightness - 0.1, -0.8, 0.8);
-        break;
-      case "a":
-        options.posterize = clamp(options.posterize + 1, 2, 8);
-        break;
-      case "d":
-        options.posterize = clamp(options.posterize - 1, 2, 8);
-        break;
-      case "q":
-        options.contrast = clamp(options.contrast - 1, 2, 16);
-        break;
-      case "e":
-        options.contrast = clamp(options.contrast + 1, 2, 16);
-        break;
-      case "1":
-        options.noise = 0;
-        break;
-      case "2":
-        options.noise = 40;
-        break;
-      case "3":
-        options.noise = 60;
-        break;
-      case "4":
-        options.noise = 80;
-        break;
+    if (e.key === "Shift") {
+      isHoldingShift = true;
+    }
+
+    if (isCropping) {
+      const speed = isHoldingShift ? 12 : 2;
+      switch (e.key) {
+        case "ArrowUp":
+          options.position.y -= speed;
+          break;
+        case "ArrowDown":
+          options.position.y += speed;
+          break;
+        case "ArrowLeft":
+          options.position.x -= speed;
+          break;
+        case "ArrowRight":
+          options.position.x += speed;
+          break;
+      }
+    } else {
+      switch (e.key) {
+        case "ArrowUp":
+          options.hue = wrap(options.hue + 10, 360);
+          break;
+        case "ArrowDown":
+          options.hue = wrap(options.hue - 10, 360);
+          break;
+        case "ArrowRight":
+          options.saturation = clamp(options.saturation + 0.1, 0, 1);
+          break;
+        case "ArrowLeft":
+          options.saturation = clamp(options.saturation - 0.1, 0, 1);
+          break;
+        case "w":
+          options.lightness = clamp(options.lightness + 0.1, -0.8, 0.8);
+          break;
+        case "s":
+          options.lightness = clamp(options.lightness - 0.1, -0.8, 0.8);
+          break;
+        case "a":
+          options.posterize = clamp(options.posterize + 1, 2, 8);
+          break;
+        case "d":
+          options.posterize = clamp(options.posterize - 1, 2, 8);
+          break;
+        case "q":
+          options.contrast = clamp(options.contrast - 1, 2, 16);
+          break;
+        case "e":
+          options.contrast = clamp(options.contrast + 1, 2, 16);
+          break;
+        case "1":
+          options.noise = 0;
+          break;
+        case "2":
+          options.noise = 40;
+          break;
+        case "3":
+          options.noise = 60;
+          break;
+        case "4":
+          options.noise = 80;
+          break;
+      }
+    }
+  }
+
+  function onKeyup(e: KeyboardEvent) {
+    if (e.key === "Shift") {
+      isHoldingShift = false;
     }
   }
 
@@ -92,15 +122,17 @@
     };
 
     document.addEventListener("keydown", onKeydown);
+    document.addEventListener("keyup", onKeyup);
 
     return () => {
       document.removeEventListener("keydown", onKeydown);
+      document.removeEventListener("keyup", onKeyup);
     }
   });
 </script>
 
 <svelte:head>
-  <title>Z.A.T.O. // I Love the Background and All the Filters On It</title>
+  <title>Z.A.T.O. // I Love the Background and All the Filters On Them</title>
 </svelte:head>
 
 <main class="flex flex-col justify-end items-center h-screen px-32">

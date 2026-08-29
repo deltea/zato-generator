@@ -5,4 +5,6 @@ export interface FilterOptions {
   posterize: number;
   noise: number;
   contrast: number;
+
+  position: { x: number, y: number }
 }

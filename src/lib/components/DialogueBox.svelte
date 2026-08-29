@@ -13,26 +13,38 @@
 
 <div class="border w-full h-64 border-b-0 px-32 pt-16 relative">
   <!-- <p>I'll see where life takes me.</p> -->
-  <div class="flex">
-    <div class="w-1/2">
-      <span>▲/▼</span> Hue <span class="text-muted">(-140º)</span><br>
-      <span>◀︎/▶︎</span> Saturation <span class="text-muted">(50%)</span><br>
-      <span>W/S</span> Lightness <span class="text-muted">(0%)</span>
+  {#if isCropping}
+    <div class="flex">
+      <div class="w-1/2">
+        <span>[▲/▼]</span> Move Up/Down<br>
+        <span>[◀︎/▶︎]</span> Move Left/Right<br>
+      </div>
+      <div class="w-1/2">
+        <span>[W/S]</span> Zoom In/Out<br>
+        <span>[SHIFT]</span> Fast Move<br>
+      </div>
     </div>
-    <div class="w-1/2">
-      <span>A/D</span> Posterize <span class="text-muted">(5)</span><br>
-      <span>Q/E</span> Contrast <span class="text-muted">(71%)</span><br>
-      <span>1-4</span> Noise <span class="text-muted">(Normal)</span>
+  {:else}
+    <div class="flex">
+      <div class="w-1/2">
+        <span>[▲/▼]</span> Hue <span class="text-muted">(-140º)</span><br>
+        <span>[◀︎/▶︎]</span> Saturation <span class="text-muted">(50%)</span><br>
+        <span>[W/S]</span> Lightness <span class="text-muted">(0%)</span>
+      </div>
+      <div class="w-1/2">
+        <span>[A/D]</span> Posterize <span class="text-muted">(5)</span><br>
+        <span>[Q/E]</span> Contrast <span class="text-muted">(71%)</span><br>
+        <span>[1-4]</span> Noise <span class="text-muted">(Normal)</span>
+      </div>
     </div>
-  </div>
+  {/if}
 
   <div class="flex bottom-0 left-1/2 -translate-x-1/2 absolute text-base text-muted">
-    <button class="px-3 pt-3 hover:text-fg" onclick={onOpen}>Q.LOAD</button>
-    <button class="px-3 pt-3 hover:text-fg" onclick={onSave}>Q.SAVE</button>
-    <button class="px-3 pt-3 hover:text-fg {isCropping ? "text-fg": "text-muted"}" onclick={onCrop}>CROP</button>
-    <button class="px-3 pt-3 hover:text-fg" onclick={onClear}>CLEAR</button>
-    <button class="px-3 pt-3 hover:text-fg" onclick={onReset}>RESET</button>
-    <a href="https://github.com/deltea/zato-generator" class="px-3 pt-3 hover:text-fg">GITHUB</a>
-    <!-- <button class="px-3 pt-3 hover:text-fg">SHARE</button> -->
+    <button class="outline-none px-3 pt-3 hover:text-highlight" onclick={onOpen}>Q.LOAD</button>
+    <button class="outline-none px-3 pt-3 hover:text-highlight" onclick={onSave}>Q.SAVE</button>
+    <button class="outline-none px-3 pt-3 hover:text-highlight {isCropping ? "text-fg!": "text-muted"}" onclick={onCrop}>CROP</button>
+    <button class="outline-none px-3 pt-3 hover:text-highlight" onclick={onClear}>CLEAR</button>
+    <button class="outline-none px-3 pt-3 hover:text-highlight" onclick={onReset}>RESET</button>
+    <a href="https://github.com/deltea/zato-generator" class="outline-none px-3 pt-3 hover:text-highlight">GITHUB</a>
   </div>
 </div>

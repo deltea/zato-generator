@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: "Courier New";
+  src: url("/fonts/Courier New.ttf") format("truetype");
+}
+
+@theme {
+  --color-bg: #000;
+  --color-fg: #fff;
+  --color-muted: #ababab;
+  --font-courier: "Courier New", monospace;
+}
+
+@layer base {
+  body {
+    @apply bg-bg text-fg font-courier text-[22px] tracking-wide;
+  }
+}
+
+@utility pixelated {
+  image-rendering: pixelated;
+}

@@ -1,9 +1,9 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import type { FilterOptions } from "$lib/types";
 
   import DialogueBox from "$lib/components/DialogueBox.svelte";
   import FilterCanvas from "$lib/components/FilterCanvas.svelte";
-    import type { FilterOptions } from "$lib/types";
 
   let filterCanvas = $state<FilterCanvas | undefined>();
   let options: FilterOptions = {
@@ -25,7 +25,7 @@
 </script>
 
 <svelte:head>
-  <title>Z.A.T.O. // I Love the Background and Everything On It</title>
+  <title>Z.A.T.O. // I Love the Background and All the Filters On It</title>
 </svelte:head>
 
 <main class="flex flex-col justify-end items-center h-screen px-32">

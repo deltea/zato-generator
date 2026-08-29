@@ -125,7 +125,7 @@
     filterImage(data);
     ctx.putImageData(imgData, 0, 0);
 
-  // black border
+    // black border
     ctx.fillRect(0, 0, canvas.width, BORDER_WIDTH);
     ctx.fillRect(canvas.width - BORDER_WIDTH, 0, BORDER_WIDTH, canvas.height);
     ctx.fillRect(0, canvas.height - BORDER_WIDTH, canvas.width, BORDER_WIDTH);

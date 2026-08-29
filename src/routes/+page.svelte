@@ -23,7 +23,7 @@
 <main class="flex flex-col justify-end items-center h-screen px-32">
   <div class="max-w-7xl w-full">
     <div class="border w-full pixelated">
-      <FilterCanvas bind:this={filterCanvas} />
+      <FilterCanvas bind:this={filterCanvas} colors={["#FFF", "#EAEAFF", "#EAD5FF", "#D5D5FF", "#D6BFEA", "#5555EA", "#262684", "#000"].toReversed()} />
     </div>
 
     <!-- speaker card -->

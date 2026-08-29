@@ -3,6 +3,10 @@
 
   const BORDER_WIDTH = 4;
 
+  let { colors }: {
+    colors: string[]
+  } = $props();
+
   let canvas: HTMLCanvasElement;
   let ctx: CanvasRenderingContext2D;
 
@@ -10,26 +14,51 @@
     ctx = canvas.getContext("2d")!;
   });
 
+  function hexToRGB(hex: string) {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+      r: parseInt(result[1], 16),
+      g: parseInt(result[2], 16),
+      b: parseInt(result[3], 16)
+    } : { r: 255, g: 255, b: 255 };
+  }
+
+  function lerp(a: number, b: number, t: number) {
+    return a + (b - a) * t;
+  }
+
+  function clamp(value: number, min: number, max: number) {
+    return Math.max(min, Math.min(max, value));
+  }
+
   function filterImage(imgData: ImageDataArray) {
+    let test = "";
     for (let i = 0; i < imgData.length; i += 4) {
       const r = imgData[i];
       const g = imgData[i + 1];
       const b = imgData[i + 2];
 
-      // convert to grayscale
+      // calculate grayscale
       const gray = 0.299 * r + 0.587 * g + 0.114 * b;
 
+      const GRAY_MIN = 0;
+      const GRAY_MAX = 20;
+      const GRAY_RANGE = GRAY_MAX - GRAY_MIN;
+
       // apply threshold
-      if (gray > 128) {
-        imgData[i] = 255;
-        imgData[i + 1] = 255;
-        imgData[i + 2] = 255;
-      } else {
-        imgData[i] = 0;
-        imgData[i + 1] = 0;
-        imgData[i + 2] = 0;
-      }
+      const val = (gray - GRAY_MIN) / GRAY_RANGE;
+      const step = (colors.length);
+      const idx = Math.floor(clamp(val * step, 0, colors.length));
+      test += idx + ", ";
+      const c = hexToRGB(colors[idx]);
+      imgData[i] = c.r;
+      imgData[i + 1] = c.g;
+      imgData[i + 2] = c.b;
+      // imgData[i] = (idx / colors.length) * 255;
+      // imgData[i + 1] = (idx / colors.length) * 255;
+      // imgData[i + 2] = (idx / colors.length) * 255;
     }
+    console.log(test);
   }
 
   export function exportImage() {

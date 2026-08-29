@@ -5,18 +5,21 @@
 
   const BORDER_WIDTH = 2;
 
-  let { options }: { options: FilterOptions } = $props();
+  let { options, img }: {
+    options: FilterOptions,
+    img: HTMLImageElement | null
+  } = $props();
+
+  $effect(() => {
+    setImage(img, options);
+  });
 
   let canvas: HTMLCanvasElement;
   let ctx: CanvasRenderingContext2D;
   let data: ImageDataArray;
 
   onMount(() => {
-    ctx = canvas.getContext("2d")!;
-
-    // document.addEventListener("keydown", (e: KeyboardEvent) => {
-
-    // });
+    ctx = canvas.getContext("2d", { willReadFrequently: true })!;
   });
 
   function applySigmoidContrast(value: number, midpoint = 128, steepness = 10) {
@@ -57,7 +60,7 @@
     }
   }
 
-  function filterImage(imgData: ImageDataArray) {
+  function filterImage(imgData: ImageDataArray, options: FilterOptions) {
     for (let i = 0; i < imgData.length; i += 4) {
       let r = imgData[i];
       let g = imgData[i + 1];
@@ -105,7 +108,9 @@
     link.click();
   }
 
-  export function setImage(img: HTMLImageElement) {
+  export function setImage(img: HTMLImageElement | null, options: FilterOptions) {
+    if (!img) return;
+
     // maintain aspect ration and center image
     if (img.width / img.height > canvas.width / canvas.height) {
       const scale = canvas.height / img.height;
@@ -119,10 +124,10 @@
       ctx.drawImage(img, 0, yOffset, canvas.width, newHeight);
     }
 
-    const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height, { });
     applyVignette(imgData);
     data = imgData.data;
-    filterImage(data);
+    filterImage(data, options);
     ctx.putImageData(imgData, 0, 0);
 
     // black border
@@ -136,6 +141,6 @@
 <canvas
   bind:this={canvas}
   width={640}
-  height={225}
-  class="sizefull w-full"
+  height={260}
+  class="w-full"
 ></canvas>

@@ -4,9 +4,11 @@
 
 adjustable settings
 
-- contrast
-- brightness
-- posterization
-- color
+- hue
+- saturation
+- lightness
+- posterize level
+- color noise amount
+- cropping
 
 </samp>

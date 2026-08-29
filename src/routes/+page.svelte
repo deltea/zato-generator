@@ -1,26 +1,75 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import type { FilterOptions } from "$lib/types";
+  import { clamp, wrap } from "$lib/utils";
 
   import DialogueBox from "$lib/components/DialogueBox.svelte";
   import FilterCanvas from "$lib/components/FilterCanvas.svelte";
 
   let filterCanvas = $state<FilterCanvas | undefined>();
-  let options: FilterOptions = {
+  let img: HTMLImageElement | null = $state(null);
+  let options: FilterOptions = $state({
     hue: -144,
     saturation: 0.5,
     lightness: 0,
     posterize: 5,
-    noise: 50
+    noise: 40
+  });
+
+  function onKeydown(e: KeyboardEvent) {
+    switch (e.key) {
+      case "ArrowUp":
+        options.hue = wrap(options.hue + 10, 360);
+        break;
+      case "ArrowDown":
+        options.hue = wrap(options.hue - 10, 360);
+        break;
+      case "ArrowRight":
+        options.saturation = clamp(options.saturation + 0.1, 0, 1);
+        break;
+      case "ArrowLeft":
+        options.saturation = clamp(options.saturation - 0.1, 0, 1);
+        break;
+      case "w":
+        options.lightness = clamp(options.lightness + 0.1, -0.8, 0.8);
+        break;
+      case "s":
+        options.lightness = clamp(options.lightness - 0.1, -0.8, 0.8);
+        break;
+      case "a":
+        options.posterize = clamp(options.posterize + 1, 2, 8);
+        break;
+      case "d":
+        options.posterize = clamp(options.posterize - 1, 2, 8);
+        break;
+      case "1":
+        options.noise = 0;
+        break;
+      case "2":
+        options.noise = 40;
+        break;
+      case "3":
+        options.noise = 60;
+        break;
+      case "4":
+        options.noise = 80;
+        break;
+    }
   }
 
   onMount(() => {
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-    img.src = "/images/placeholder/school.webp";
-    img.onload = () => {
-      filterCanvas?.setImage(img);
+    const image = new Image();
+    image.crossOrigin = "anonymous";
+    image.src = "/images/placeholder/school.webp";
+    image.onload = () => {
+      img = image;
     };
+
+    document.addEventListener("keydown", onKeydown);
+
+    return () => {
+      document.removeEventListener("keydown", onKeydown);
+    }
   });
 </script>
 
@@ -31,7 +80,7 @@
 <main class="flex flex-col justify-end items-center h-screen px-32">
   <div class="max-w-7xl w-full">
     <div class="border w-full pixelated">
-      <FilterCanvas bind:this={filterCanvas} {options} />
+      <FilterCanvas bind:this={filterCanvas} {options} {img} />
     </div>
 
     <!-- speaker card -->

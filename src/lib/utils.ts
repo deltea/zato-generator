@@ -73,3 +73,8 @@ export function clamp(value: number, min: number, max: number) {
 export function noise(intensity: number) {
   return ((Math.random() + Math.random()) / 2 - 0.5) * intensity;
 }
+
+export function wrap(value: number, max: number, min: number = 0) {
+  const range = max - min;
+  return ((((value - min) % range) + range) % range) + min;
+}

@@ -1,64 +1,74 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import { clamp, noise, hslToRgb, rgbToHsl } from "$lib/utils";
 
-  const BORDER_WIDTH = 4;
+  const BORDER_WIDTH = 2;
+  let HUE = -138;
+  let SATURATION = 0.4;
+  let LIGHTNESS = 0.2;
+  let POSTERIZE = 6;
+  let NOISE = 40;
 
-  let { colors }: {
-    colors: string[]
+  let { color }: {
+    color: string
   } = $props();
 
   let canvas: HTMLCanvasElement;
   let ctx: CanvasRenderingContext2D;
+  let data: ImageDataArray;
 
   onMount(() => {
     ctx = canvas.getContext("2d")!;
+
+    document.addEventListener("keydown", (e: KeyboardEvent) => {
+
+    });
   });
 
-  function hexToRGB(hex: string) {
-    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result ? {
-      r: parseInt(result[1], 16),
-      g: parseInt(result[2], 16),
-      b: parseInt(result[3], 16)
-    } : { r: 255, g: 255, b: 255 };
-  }
-
-  function lerp(a: number, b: number, t: number) {
-    return a + (b - a) * t;
-  }
-
-  function clamp(value: number, min: number, max: number) {
-    return Math.max(min, Math.min(max, value));
+  function applySigmoidContrast(value: number, midpoint = 200, steepness = 10) {
+    const x = (value - midpoint) / 255;
+    return 255 / (1 + Math.exp(-steepness * x));
   }
 
   function filterImage(imgData: ImageDataArray) {
-    let test = "";
     for (let i = 0; i < imgData.length; i += 4) {
-      const r = imgData[i];
-      const g = imgData[i + 1];
-      const b = imgData[i + 2];
+      let r = imgData[i];
+      let g = imgData[i + 1];
+      let b = imgData[i + 2];
 
-      // calculate grayscale
-      const gray = 0.299 * r + 0.587 * g + 0.114 * b;
+      // turn to grayscale and apply contrast
+      let gray = 0.299 * r + 0.587 * g + 0.114 * b;
+      gray = applySigmoidContrast(gray, 160, 10);
 
-      const GRAY_MIN = 0;
-      const GRAY_MAX = 20;
-      const GRAY_RANGE = GRAY_MAX - GRAY_MIN;
+      r = g = b = gray;
 
-      // apply threshold
-      const val = (gray - GRAY_MIN) / GRAY_RANGE;
-      const step = (colors.length);
-      const idx = Math.floor(clamp(val * step, 0, colors.length));
-      test += idx + ", ";
-      const c = hexToRGB(colors[idx]);
-      imgData[i] = c.r;
-      imgData[i + 1] = c.g;
-      imgData[i + 2] = c.b;
-      // imgData[i] = (idx / colors.length) * 255;
-      // imgData[i + 1] = (idx / colors.length) * 255;
-      // imgData[i + 2] = (idx / colors.length) * 255;
+      let { h, s, l } = rgbToHsl(r, g, b);
+
+      // adjust hsl
+      h = (h + HUE + 360) % 360;
+      s = clamp(s + SATURATION, 0, 1);
+      l = clamp(l + LIGHTNESS, 0, 1);
+
+      const rgb = hslToRgb(h, s, l);
+      r = rgb.r;
+      g = rgb.g;
+      b = rgb.b;
+
+      // add color noise
+      r = clamp(r + noise(NOISE), 0, 255);
+      g = clamp(g + noise(NOISE), 0, 255);
+      b = clamp(b + noise(NOISE), 0, 255);
+
+      // posterization
+      const step = 255 / (POSTERIZE - 1);
+      r = Math.round(Math.round(r / step) * step);
+      g = Math.round(Math.round(g / step) * step);
+      b = Math.round(Math.round(b / step) * step);
+
+      imgData[i] = r;
+      imgData[i + 1] = g;
+      imgData[i + 2] = b;
     }
-    console.log(test);
   }
 
   export function exportImage() {
@@ -83,11 +93,11 @@
     }
 
     const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const data = imgData.data;
+    data = imgData.data;
     filterImage(data);
     ctx.putImageData(imgData, 0, 0);
 
-    // 4px border
+  // black border
     ctx.fillRect(0, 0, canvas.width, BORDER_WIDTH);
     ctx.fillRect(canvas.width - BORDER_WIDTH, 0, BORDER_WIDTH, canvas.height);
     ctx.fillRect(0, canvas.height - BORDER_WIDTH, canvas.width, BORDER_WIDTH);
@@ -97,7 +107,7 @@
 
 <canvas
   bind:this={canvas}
-  width={1280}
-  height={450}
+  width={640}
+  height={225}
   class="sizefull w-full"
 ></canvas>

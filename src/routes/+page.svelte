@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import type { FilterOptions } from "$lib/types";
-  import { clamp, wrap } from "$lib/utils";
+  import { clamp, randSeed, wrap } from "$lib/utils";
 
   import DialogueBox from "$lib/components/DialogueBox.svelte";
   import FilterCanvas from "$lib/components/FilterCanvas.svelte";
@@ -12,7 +12,7 @@
     saturation: 0.5,
     lightness: 0,
     posterize: 5,
-    noise: 40,
+    noise: 60,
     contrast: 10,
     position: { x: 0, y: 0 },
     zoom: 1
@@ -25,6 +25,9 @@
   let options: FilterOptions = $state(defaultOptions);
   let fileInput: HTMLInputElement;
   let speaker: string | null = $state(null);
+
+  let dialogueText = $state("");
+  let isEditing = $state(false);
 
   function onKeydown(e: KeyboardEvent) {
     if (e.key === "Shift") {
@@ -118,7 +121,20 @@
   }
 
   function clear() {
-    img = null;
+    isEditing = false;
+    dialogueText = "";
+
+    const image = new Image();
+    image.crossOrigin = "anonymous";
+    image.src = "https://loremflickr.com/640/620/landscape,buildings?random=" + randSeed();
+    speaker = "LOADING";
+    image.onload = () => {
+      img = image;
+      speaker = null;
+      resetFilters();
+      options.hue = Math.floor(Math.random() * 360);
+      dialogueText = "Z.A.T.O // I Love the Backgrounds and All the Filters on Them\nDrag and drop an image file or load a file...";
+    };
   }
 
   function resetFilters() {
@@ -154,8 +170,15 @@
     const image = new Image();
     image.crossOrigin = "anonymous";
     image.src = URL.createObjectURL(file);
-    image.onload = () => img = image;
-    speaker = file.name;
+    speaker = "LOADING";
+    image.onload = () => {
+      speaker = file.name;
+      img = image;
+      dialogueText = "";
+      isEditing = true;
+      resetFilters();
+      options.hue = Math.floor(Math.random() * 360);
+    }
   }
 
   function preventDefaults(e: Event) {
@@ -164,12 +187,7 @@
   }
 
   onMount(() => {
-    const image = new Image();
-    image.crossOrigin = "anonymous";
-    image.src = "/images/placeholder/school.webp";
-    image.onload = () => {
-      img = image;
-    };
+    clear()
 
     document.addEventListener("keydown", onKeydown);
     document.addEventListener("keyup", onKeyup);
@@ -211,6 +229,8 @@
       onOpen={() => fileInput.click()}
       {isCropping}
       {options}
+      targetText={dialogueText}
+      {isEditing}
     />
   </div>
 </main>

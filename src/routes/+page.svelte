@@ -1,11 +1,12 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import type { FilterOptions } from "$lib/types";
-  import { clamp, randSeed, wrap } from "$lib/utils";
+  import { clamp, wrap } from "$lib/utils";
 
   import DialogueBox from "$lib/components/DialogueBox.svelte";
   import FilterCanvas from "$lib/components/FilterCanvas.svelte";
 
+  const placeholderImgCount = 22;
   const validFileTypes = ["image/png", "image/jpeg", "image/webp"];
   const defaultOptions: FilterOptions = {
     hue: 220,
@@ -26,11 +27,12 @@
   let fileInput: HTMLInputElement;
   let speaker: string | null = $state(null);
   let refreshInterval: NodeJS.Timeout;
+  let placeholderIdx = 0;
 
   let dialogueText = $state("");
   let isEditing = $state(false);
 
-  function onKeydown(e: KeyboardEvent) {
+  async function onKeydown(e: KeyboardEvent) {
     if (e.key === "Shift") {
       isHoldingShift = true;
     } else if (e.key === "r") {
@@ -124,20 +126,20 @@
   async function clear() {
     isEditing = false;
 
-    dialogueText = "";
-    speaker = "LOADING";
+    refreshPlaceholder();
 
-    await refreshPlaceholder();
-
-    dialogueText = "Z.A.T.O // I Love the Backgrounds and All the Filters on Them\nDrag and drop an image file or load a file...";
+    dialogueText = "Z.A.T.O // I Love the Backgrounds and All the Filters on Them\n\nDrag and drop an image file or load a file...";
     speaker = null;
   }
 
   function refreshPlaceholder() {
     return new Promise((resolve) => {
       const image = new Image();
-      image.crossOrigin = "anonymous";
-      image.src = "https://loremflickr.com/640/620/landscape,buildings?random=" + randSeed();
+      let newIdx = Math.floor(Math.random() * placeholderImgCount - 1) + 1;
+      while (placeholderIdx === newIdx) newIdx = Math.floor(Math.random() * placeholderImgCount - 1) + 1;
+      placeholderIdx = newIdx;
+
+      image.src = `/images/placeholder/img_${placeholderIdx}.jpg`;
       image.onload = () => {
         if (isEditing) return;
         resolve(image);
@@ -197,9 +199,27 @@
     e.stopPropagation();
   }
 
-  onMount(() => {
-    clear()
+  function preloadImage(url: string) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.src = url;
+      img.onload = () => resolve(url);
+      img.onerror = () => reject(url);
+    });
+  }
 
+  async function preloadPlaceholders() {
+    for (let i = 1; i <= placeholderImgCount; i++) {
+      const url = `/images/placeholder/img_${i}.jpg`;
+      try {
+        await preloadImage(url);
+      } catch {
+        console.warn("skipped broken url: " + url);
+      }
+    }
+  }
+
+  onMount(() => {
     document.addEventListener("keydown", onKeydown);
     document.addEventListener("keyup", onKeyup);
     window.addEventListener("drop", onDrop);
@@ -208,9 +228,12 @@
       window.addEventListener(eventName, preventDefaults, false);
     });
 
-    refreshInterval = setInterval(() => {
-      if (!isEditing) refreshPlaceholder();
-    }, 2000);
+    preloadPlaceholders().then(() => {
+      clear();
+      refreshInterval = setInterval(() => {
+        if (!isEditing) refreshPlaceholder();
+      }, 1500);
+    });
 
     return () => {
       document.removeEventListener("keydown", onKeydown);

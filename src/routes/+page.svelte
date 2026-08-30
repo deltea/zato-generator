@@ -25,6 +25,10 @@
   function onKeydown(e: KeyboardEvent) {
     if (e.key === "Shift") {
       isHoldingShift = true;
+    } else if (e.key === "r") {
+      resetFilters();
+    } else if (e.key === "c") {
+      toggleCropping();
     }
 
     if (isCropping) {
@@ -52,10 +56,10 @@
           options.hue = wrap(options.hue - 10, 360);
           break;
         case "ArrowRight":
-          options.saturation = clamp(options.saturation + 0.1, 0, 1);
+          options.saturation = clamp(options.saturation + 0.1, 0.1, 1);
           break;
         case "ArrowLeft":
-          options.saturation = clamp(options.saturation - 0.1, 0, 1);
+          options.saturation = clamp(options.saturation - 0.1, 0.1, 1);
           break;
         case "w":
           options.lightness = clamp(options.lightness + 0.1, -0.8, 0.8);
@@ -143,7 +147,7 @@
 
     <!-- speaker card -->
     <div class="text-3xl py-4 px-5 border w-fit -my-6 bg-bg ml-12 z-10 relative">
-      [???]
+      [SCHOOL.JPG]
     </div>
 
     <DialogueBox

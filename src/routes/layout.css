@@ -14,8 +14,12 @@
 }
 
 @layer base {
+  * {
+    @apply decoration-1;
+  }
+
   body {
-    @apply bg-bg text-fg font-courier text-[22px] tracking-wide;
+    @apply bg-bg text-fg font-courier text-[22px] tracking-wide underline-offset-2;
   }
 }
 

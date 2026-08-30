@@ -39,12 +39,17 @@
     </div>
   {/if}
 
-  <div class="flex bottom-0 left-1/2 -translate-x-1/2 absolute text-base text-muted">
-    <button class="outline-none px-3 pt-3 hover:text-highlight" onclick={onOpen}>Q.LOAD</button>
-    <button class="outline-none px-3 pt-3 hover:text-highlight" onclick={onSave}>Q.SAVE</button>
-    <button class="outline-none px-3 pt-3 hover:text-highlight {isCropping ? "text-fg!": "text-muted"}" onclick={onCrop}>CROP</button>
-    <button class="outline-none px-3 pt-3 hover:text-highlight" onclick={onClear}>CLEAR</button>
-    <button class="outline-none px-3 pt-3 hover:text-highlight" onclick={onReset}>RESET</button>
+  <div class="flex bottom-0 left-0 w-full justify-center absolute text-base text-muted">
+    <button class="outline-none px-4 pt-3 hover:text-highlight" onclick={onOpen}>Q.LOAD</button>
+    <button class="outline-none px-4 pt-3 hover:text-highlight" onclick={onSave}>Q.SAVE</button>
+    <button
+      class="outline-none px-4 pt-3 hover:text-highlight {isCropping ? "text-fg!": "text-muted"}"
+      onclick={onCrop}
+    >
+      <u>C</u>ROP
+    </button>
+    <button class="outline-none px-4 pt-3 hover:text-highlight" onclick={onReset}><u>R</u>ESET</button>
+    <button class="outline-none px-4 pt-3 hover:text-highlight" onclick={onClear}>CLEAR</button>
     <a href="https://github.com/deltea/zato-generator" class="outline-none px-3 pt-3 hover:text-highlight">GITHUB</a>
   </div>
 </div>

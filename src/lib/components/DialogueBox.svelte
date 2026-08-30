@@ -31,7 +31,7 @@
         <span>[◀︎/▶︎]</span> Move Left/Right <span class="text-muted">({-options.position.x}px)</span><br>
       </div>
       <div class="w-1/2">
-        <span>[W/S]</span> Zoom In/Out <span class="text-muted">(100%)</span><br>
+        <span>[W/S]</span> Zoom In/Out <span class="text-muted">({Math.round(options.zoom * 100)}%)</span><br>
         <span>[Shift]</span> Fast Move<br>
       </div>
     </div>

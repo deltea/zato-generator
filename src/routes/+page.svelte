@@ -14,7 +14,8 @@
     posterize: 5,
     noise: 40,
     contrast: 10,
-    position: { x: 0, y: 0 }
+    position: { x: 0, y: 0 },
+    zoom: 1
   }
 
   let filterCanvas = $state<FilterCanvas>();
@@ -49,6 +50,11 @@
         case "ArrowRight":
           options.position.x -= speed;
           break;
+        case "w":
+          options.zoom = clamp(options.zoom + 0.2, 1, 3);
+          break;
+        case "s":
+          options.zoom = clamp(options.zoom - 0.2, 1, 3);
       }
     } else {
       switch (e.key) {
@@ -144,16 +150,17 @@
     }
   }
 
-  function openFileDialog() {
-    fileInput.click();
-  }
-
   function uploadImage(file: File) {
     const image = new Image();
     image.crossOrigin = "anonymous";
     image.src = URL.createObjectURL(file);
     image.onload = () => img = image;
     speaker = file.name;
+  }
+
+  function preventDefaults(e: Event) {
+    e.preventDefault();
+    e.stopPropagation();
   }
 
   onMount(() => {
@@ -166,10 +173,17 @@
 
     document.addEventListener("keydown", onKeydown);
     document.addEventListener("keyup", onKeyup);
+    window.addEventListener("drop", onDrop);
+
+    ["dragenter", "dragover", "dragleave", "drop"].forEach(eventName => {
+      window.addEventListener(eventName, preventDefaults, false);
+    });
+
 
     return () => {
       document.removeEventListener("keydown", onKeydown);
       document.removeEventListener("keyup", onKeyup);
+      window.removeEventListener("drop", onDrop);
     }
   });
 </script>
@@ -178,10 +192,7 @@
   <title>Z.A.T.O. // I Love the Background and All the Filters On Them</title>
 </svelte:head>
 
-<main
-  class="flex flex-col justify-end items-center h-screen px-32"
-  ondrop={onDrop}
->
+<main class="flex flex-col justify-end items-center h-screen px-32">
   <div class="max-w-7xl min-w-280 w-full">
     <div class="border w-full pixelated">
       <FilterCanvas bind:this={filterCanvas} {options} {img} />
@@ -197,7 +208,7 @@
       onCrop={toggleCropping}
       onClear={clear}
       onReset={resetFilters}
-      onOpen={openFileDialog}
+      onOpen={() => fileInput.click()}
       {isCropping}
       {options}
     />

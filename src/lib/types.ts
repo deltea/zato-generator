@@ -6,5 +6,6 @@ export interface FilterOptions {
   noise: number;
   contrast: number;
 
-  position: { x: number, y: number }
+  position: { x: number, y: number };
+  zoom: number;
 }

@@ -116,14 +116,14 @@
     // maintain aspect ration and center image
     if (img.width / img.height > canvas.width / canvas.height) {
       const scale = canvas.height / img.height;
-      const newWidth = img.width * scale;
+      const newWidth = img.width * scale * options.zoom;
       const xOffset = (canvas.width - newWidth) / 2;
-      ctx.drawImage(img, xOffset + options.position.x, options.position.y, newWidth, canvas.height);
+      ctx.drawImage(img, xOffset + options.position.x, options.position.y, newWidth, canvas.height * options.zoom);
     } else {
       const scale = canvas.width / img.width;
-      const newHeight = img.height * scale;
+      const newHeight = img.height * scale * options.zoom;
       const yOffset = (canvas.height - newHeight) / 2;
-      ctx.drawImage(img, options.position.x, yOffset + options.position.y, canvas.width, newHeight);
+      ctx.drawImage(img, options.position.x, yOffset + options.position.y, canvas.width * options.zoom, newHeight);
     }
 
     const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height, { });

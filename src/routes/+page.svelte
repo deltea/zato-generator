@@ -86,12 +86,15 @@
           options.noise = 0;
           break;
         case "2":
-          options.noise = 40;
+          options.noise = 20;
           break;
         case "3":
-          options.noise = 60;
+          options.noise = 40;
           break;
         case "4":
+          options.noise = 60;
+          break;
+        case "5":
           options.noise = 80;
           break;
       }

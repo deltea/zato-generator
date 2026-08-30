@@ -15,6 +15,7 @@
 
   function getNoiseLevelName(level: number) {
     if (level <= 0) return "None";
+    else if (level <= 20) return "Minimal";
     else if (level <= 40) return "Normal";
     else if (level <= 60) return "Noisy";
     else if (level <= 80) return "Very Noisy";
@@ -46,7 +47,7 @@
       <div class="w-1/2">
         <span>[A/D]</span> Posterize <span class="text-muted">({options.posterize})</span><br>
         <span>[Q/E]</span> Contrast <span class="text-muted">({Math.round(options.contrast / 14 * 100)}%)</span><br>
-        <span>[1-4]</span> Noise <span class="text-muted">({getNoiseLevelName(options.noise)})</span>
+        <span>[1-5]</span> Noise <span class="text-muted">({getNoiseLevelName(options.noise)})</span>
       </div>
     </div>
   {/if}

@@ -79,10 +79,11 @@ export function wrap(value: number, max: number, min: number = 0) {
   return ((((value - min) % range) + range) % range) + min;
 }
 
-export function randSeed(length: number = 32) {
+export function randSeed(length: number = 16) {
   let output = "";
   for (let index = 0; index < length; index++) {
     output += Math.floor(Math.random() * 10);
   }
+  console.log(output);
   return output;
 }

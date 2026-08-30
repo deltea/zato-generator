@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { FilterOptions } from "$lib/types";
+  import { onDestroy } from "svelte";
 
   const TYPING_SPEED = 80;
 
@@ -47,6 +48,8 @@
     else if (level <= 60) return "Noisy";
     else if (level <= 80) return "Very Noisy";
   }
+
+  onDestroy(() => clearInterval(typeInterval));
 </script>
 
 <div class="border w-full h-64 border-b-0 px-32 pt-16 relative">

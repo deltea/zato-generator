@@ -25,6 +25,7 @@
   let options: FilterOptions = $state(defaultOptions);
   let fileInput: HTMLInputElement;
   let speaker: string | null = $state(null);
+  let refreshInterval: NodeJS.Timeout;
 
   let dialogueText = $state("");
   let isEditing = $state(false);
@@ -120,21 +121,31 @@
     isCropping = !isCropping;
   }
 
-  function clear() {
+  async function clear() {
     isEditing = false;
-    dialogueText = "";
 
-    const image = new Image();
-    image.crossOrigin = "anonymous";
-    image.src = "https://loremflickr.com/640/620/landscape,buildings?random=" + randSeed();
+    dialogueText = "";
     speaker = "LOADING";
-    image.onload = () => {
-      img = image;
-      speaker = null;
-      resetFilters();
-      options.hue = Math.floor(Math.random() * 360);
-      dialogueText = "Z.A.T.O // I Love the Backgrounds and All the Filters on Them\nDrag and drop an image file or load a file...";
-    };
+
+    await refreshPlaceholder();
+
+    dialogueText = "Z.A.T.O // I Love the Backgrounds and All the Filters on Them\nDrag and drop an image file or load a file...";
+    speaker = null;
+  }
+
+  function refreshPlaceholder() {
+    return new Promise((resolve) => {
+      const image = new Image();
+      image.crossOrigin = "anonymous";
+      image.src = "https://loremflickr.com/640/620/landscape,buildings?random=" + randSeed();
+      image.onload = () => {
+        if (isEditing) return;
+        resolve(image);
+        img = image;
+        resetFilters();
+        options.hue = Math.floor(Math.random() * 360);
+      }
+    });
   }
 
   function resetFilters() {
@@ -197,11 +208,16 @@
       window.addEventListener(eventName, preventDefaults, false);
     });
 
+    refreshInterval = setInterval(() => {
+      if (!isEditing) refreshPlaceholder();
+    }, 2000);
 
     return () => {
       document.removeEventListener("keydown", onKeydown);
       document.removeEventListener("keyup", onKeyup);
       window.removeEventListener("drop", onDrop);
+
+      clearInterval(refreshInterval);
     }
   });
 </script>
@@ -224,7 +240,7 @@
     <DialogueBox
       onSave={filterCanvas?.exportImage}
       onCrop={toggleCropping}
-      onClear={clear}
+      onClear={() => { if (isEditing) clear() }}
       onReset={resetFilters}
       onOpen={() => fileInput.click()}
       {isCropping}

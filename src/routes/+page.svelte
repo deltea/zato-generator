@@ -6,6 +6,7 @@
   import DialogueBox from "$lib/components/DialogueBox.svelte";
   import FilterCanvas from "$lib/components/FilterCanvas.svelte";
 
+  const validFileTypes = ["image/png", "image/jpeg", "image/webp"];
   const defaultOptions: FilterOptions = {
     hue: 220,
     saturation: 0.5,
@@ -21,6 +22,8 @@
   let isCropping = $state(false);
   let isHoldingShift = false;
   let options: FilterOptions = $state(defaultOptions);
+  let fileInput: HTMLInputElement;
+  let speaker: string | null = $state(null);
 
   function onKeydown(e: KeyboardEvent) {
     if (e.key === "Shift") {
@@ -35,16 +38,16 @@
       const speed = isHoldingShift ? 12 : 2;
       switch (e.key) {
         case "ArrowUp":
-          options.position.y -= speed;
-          break;
-        case "ArrowDown":
           options.position.y += speed;
           break;
+        case "ArrowDown":
+          options.position.y -= speed;
+          break;
         case "ArrowLeft":
-          options.position.x -= speed;
+          options.position.x += speed;
           break;
         case "ArrowRight":
-          options.position.x += speed;
+          options.position.x -= speed;
           break;
       }
     } else {
@@ -113,8 +116,41 @@
     options = defaultOptions;
   }
 
+  function fileInputChange(e: Event) {
+    const target = e.target as HTMLInputElement;
+    const files = target.files;
+
+    if (files && files.length > 0) {
+      uploadImage(files[0]);
+    } else {
+      console.error("no file selected");
+    }
+  }
+
+  function onDrop(e: DragEvent) {
+    e.preventDefault();
+    const files = e.dataTransfer?.files;
+    if (files && files.length > 0) {
+      if (validFileTypes.includes(files[0].type)) {
+        uploadImage(files[0]);
+      } else {
+        console.error("invalid file type");
+      }
+    } else {
+      console.error("no file dropped");
+    }
+  }
+
   function openFileDialog() {
-    // open file picker
+    fileInput.click();
+  }
+
+  function uploadImage(file: File) {
+    const image = new Image();
+    image.crossOrigin = "anonymous";
+    image.src = URL.createObjectURL(file);
+    image.onload = () => img = image;
+    speaker = file.name;
   }
 
   onMount(() => {
@@ -139,15 +175,18 @@
   <title>Z.A.T.O. // I Love the Background and All the Filters On Them</title>
 </svelte:head>
 
-<main class="flex flex-col justify-end items-center h-screen px-32">
-  <div class="max-w-7xl w-full">
+<main
+  class="flex flex-col justify-end items-center h-screen px-32"
+  ondrop={onDrop}
+>
+  <div class="max-w-7xl min-w-280 w-full">
     <div class="border w-full pixelated">
       <FilterCanvas bind:this={filterCanvas} {options} {img} />
     </div>
 
     <!-- speaker card -->
-    <div class="text-3xl py-4 px-5 border w-fit -my-6 bg-bg ml-12 z-10 relative">
-      [SCHOOL.JPG]
+    <div class="text-3xl py-4 px-5 border w-fit -my-6 bg-bg ml-12 z-10 relative uppercase">
+      [{speaker ?? "???"}]
     </div>
 
     <DialogueBox
@@ -157,6 +196,18 @@
       onReset={resetFilters}
       onOpen={openFileDialog}
       {isCropping}
+      {options}
     />
   </div>
 </main>
+
+<input
+  onchange={fileInputChange}
+  bind:this={fileInput}
+  accept={validFileTypes.join(",")}
+  type="file"
+  name="music"
+  id="music"
+  class="hidden"
+  multiple={false}
+/>
